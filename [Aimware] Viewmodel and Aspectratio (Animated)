@@ -1,0 +1,52 @@
+-- Make by Underpook#4733
+
+local ref = gui.Reference("VISUALS")
+local tab = gui.Tab(ref, "Underpook", "Vievmodel")
+
+local viewmodelbox   = gui.Groupbox(tab, "Viewmodel", 320, 16, 287.5, 100);
+
+local viewmodelxref      = gui.Slider(viewmodelbox, "viewmodelx", "Viewmodel Changer X", 0, -40, 40, 0.1)
+local viewmodelyref      = gui.Slider(viewmodelbox, "viewmodely", "Viewmodel Changer Y", 0, -40, 40, 0.1)
+local viewmodelzref      = gui.Slider(viewmodelbox, "viewmodelz", "Viewmodel Changer Z", 0, -40, 40, 0.1)
+
+local aspectratioref     = gui.Slider(viewmodelbox, "aspect", "Aspect Ratio", 1.79, 0, 2, 0.01)
+
+local standart = {
+    x = client.GetConVar("viewmodel_offset_x"),
+    y = client.GetConVar("viewmodel_offset_y"),
+    z = client.GetConVar("viewmodel_offset_z"),
+}
+
+local function lerp(a, b, c)
+    return a + (b - a) * c
+end
+
+local x, y, z, ar = standart.x, standart.y, standart.z, 1.78
+
+local function viewmodel(UserCmd)
+    x = lerp(x, standart.x + viewmodelxref:GetValue(), .2)
+    y = lerp(y, standart.y + viewmodelyref:GetValue(), .2)
+    z = lerp(z, standart.z + viewmodelzref:GetValue(), .2)
+
+    client.SetConVar("viewmodel_offset_x", x, true)
+    client.SetConVar("viewmodel_offset_y", y, true)
+    client.SetConVar("viewmodel_offset_z", z, true)
+end
+
+local function aspectratio(UserCmd)
+    ar = lerp(ar, aspectratioref:GetValue(), .2)
+
+    client.SetConVar("r_aspectratio", ar, true)
+end
+
+callbacks.Register("CreateMove", function(UserCmd)
+    viewmodel(UserCmd)
+    aspectratio(UserCmd)
+end)
+
+callbacks.Register("Unload", function(UserCmd)
+    client.SetConVar("viewmodel_offset_x", standart.x, true)
+    client.SetConVar("viewmodel_offset_y", standart.y, true)
+    client.SetConVar("viewmodel_offset_z", standart.z, true)
+    client.SetConVar("r_aspectratio", 0, true)
+end)
